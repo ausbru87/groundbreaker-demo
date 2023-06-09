@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ../../global/cluster-certificates
+
+patchesStrategicMerge:
+- |-
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: letsencrypt-ingress
+    namespace: openshift-ingress
+  spec:
+    commonName: "*.apps.groundbreaker-acm.rhtps.io"
+    dnsNames:
+    - "*.apps.groundbreaker-acm.rhtps.io"

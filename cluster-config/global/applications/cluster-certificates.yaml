@@ -1,3 +1,12 @@
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  name: cluster-certificates-placement
+  namespace: openshift-gitops
+spec:
+  clusterSets:
+    - global
+---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -9,7 +18,7 @@ spec:
       configMapRef: acm-placement
       labelSelector:
         matchLabels:
-          cluster.open-cluster-management.io/placement: cert-manager-placement
+          cluster.open-cluster-management.io/placement: cluster-certificates-placement
       requeueAfterSeconds: 30
   template:
     metadata:
@@ -22,9 +31,9 @@ spec:
         server: '{{server}}'
       project: default
       source:
-        path: cluster-certificates/{{name}}
-        repoURL: https://github.com/kincl/multicloud-gitops.git
-        targetRevision: main
+        path: cluster-config/{{name}}/cluster-certificates
+        repoURL: git@github.com:rh-nspdev/groundbreaker-demo.git
+        targetRevision: base-gitops
       syncPolicy:
         automated:
           prune: true
