@@ -55,3 +55,9 @@ $ oc adm groups add-users cluster-admins <your username>
 
 ### Deploy Cluster Certificate Management Applications
 
+Now we can deploy the ApplicationSets that manage the cert-manager operator as well as the resources that manage updating the default ingress and API server certificates.
+
+```
+$ oc apply -f cluster-config/global/applications/cert-manager-operator.yaml
+$ oc apply -f cluster-config/global/applications/cluster-certificates.yaml
+```
