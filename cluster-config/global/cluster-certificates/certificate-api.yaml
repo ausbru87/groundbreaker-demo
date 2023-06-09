@@ -1,10 +1,10 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: letsencrypt-ingress
-  namespace: openshift-ingress
+  name: letsencrypt-api
+  namespace: openshift-config
 spec:
-  secretName: letsencrypt-ingress
+  secretName: letsencrypt-api
   duration: 2160h0m0s # 90d
   renewBefore: 720h0m0s # 30d is recommended by LE
   commonName: PLACEHOLDER

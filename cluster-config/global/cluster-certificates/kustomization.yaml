@@ -4,3 +4,5 @@ kind: Kustomization
 resources:
 - ingresscontroller.yaml
 - certificate-ingress.yaml
+- apiserver.yaml
+- certificate-api.yaml

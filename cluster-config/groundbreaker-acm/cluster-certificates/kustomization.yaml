@@ -15,3 +15,25 @@ patchesStrategicMerge:
     commonName: "*.apps.groundbreaker-acm.rhtps.io"
     dnsNames:
     - "*.apps.groundbreaker-acm.rhtps.io"
+- |-
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: letsencrypt-api
+    namespace: openshift-config
+  spec:
+    commonName: "api.groundbreaker-acm.rhtps.io"
+    dnsNames:
+    - "api.groundbreaker-acm.rhtps.io"
+- |-
+  apiVersion: config.openshift.io/v1
+  kind: APIServer
+  metadata:
+    name: cluster
+  spec:
+    servingCerts:
+      namedCertificates:
+      - names:
+        - "api.groundbreaker-acm.rhtps.io"
+        servingCertificate:
+          name: letsencrypt-api
