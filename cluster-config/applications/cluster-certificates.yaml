@@ -33,7 +33,7 @@ spec:
       source:
         path: cluster-config/clusters/{{name}}/cluster-certificates
         repoURL: git@github.com:rh-nspdev/groundbreaker-demo.git
-        targetRevision: base-gitops
+        targetRevision: main
       syncPolicy:
         automated:
           prune: true
