@@ -1,7 +1,7 @@
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
-  name: cert-manager-operator-placement
+  name: cluster-certificates-placement
   namespace: openshift-gitops
 spec:
   clusterSets:
@@ -10,7 +10,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: cert-manager-operator
+  name: cluster-certificates
   namespace: openshift-gitops
 spec:
   generators:
@@ -18,20 +18,20 @@ spec:
       configMapRef: acm-placement
       labelSelector:
         matchLabels:
-          cluster.open-cluster-management.io/placement: cert-manager-operator-placement
+          cluster.open-cluster-management.io/placement: cluster-certificates-placement
       requeueAfterSeconds: 30
   template:
     metadata:
       labels:
         velero.io/exclude-from-backup: "true"
-      name: cert-manager-operator-{{name}}
+      name: cluster-certificates-{{name}}
     spec:
       destination:
-        namespace: cert-manager-operator
+        namespace: openshift-ingress
         server: '{{server}}'
       project: default
       source:
-        path: cluster-config/global/cert-manager-operator
+        path: cluster-config/clusters/{{name}}/cluster-certificates
         repoURL: git@github.com:rh-nspdev/groundbreaker-demo.git
         targetRevision: base-gitops
       syncPolicy:

@@ -2,7 +2,20 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ingresscontroller.yaml
-- certificate-ingress.yaml
-- apiserver.yaml
+# install
+- namespace.yaml
+- operatorgroup.yaml
+- subscription.yaml
+
+# configure
+- certmanager.yaml
+- clusterissuer.yaml
+- credentialrequest.yaml
+
+# issue
 - certificate-api.yaml
+- certificate-ingress.yaml
+
+# deploy
+- ingresscontroller.yaml
+- apiserver.yaml

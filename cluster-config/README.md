@@ -1,5 +1,13 @@
 # Cluster Configuration
 
+## Repository Filesystem Layout
+
+| Directory | Purpose |
+| ---- | ------- |
+| applications/ | Where the ApplicationSets that ACM uses on the hub to configure the managed clusters |
+| global/ | Where all of the generic Kubernetes deployment YAML is |
+| clusters/ | Using Kustomize we build off of the configs in global/ and customize them for the specific cluster |
+
 ## Getting Started
 
 ### Hub Cluster (groundbreaker-acm)
@@ -19,7 +27,7 @@ $ oc apply -k groundbreaker-acm/argocd
 
 Once the links are made, ACM will populate the clusters based on the placement rule in the Argo CD instance in the openshift-gitops namespace.
 
-### Configure ArgoCD
+### Configure ArgoCD for GitHub Repository
 
 Since we are using a private repo on GitHub we have to configure ArgoCD to use a token for authentication.
 
@@ -46,18 +54,27 @@ Add the public key to the list of [deploy keys for the repository.](https://gith
 
 #### Debugging ArgoCD
 
-By default, users have no permissions in the cluster-wide ArgoCD. We will add our user to a cluster-admins group to debug ArgoCD directly.
+By default, users have no permissions in the cluster-wide ArgoCD deployed into the `openshift-gitops` namespace. We will add our user to a cluster-admins group to debug ArgoCD directly.
 
 ```
 $ oc adm groups new cluster-admins
 $ oc adm groups add-users cluster-admins <your username>
 ```
 
-### Deploy Cluster Certificate Management Applications
+We are using [sync phases](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) extensively with ArgoCD to place resources in a particular order.
 
-Now we can deploy the ApplicationSets that manage the cert-manager operator as well as the resources that manage updating the default ingress and API server certificates.
+### Deploy Cluster Certificate Management
+
+Now we can deploy the ApplicationSet that manages the cert-manager operator as well as the resources that manage updating the default ingress and API server certificates.
+
+Note: Managed clusters may go offline as a result of changing the API certificates, [ACM has documentation on how to fix it](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.7/html-single/troubleshooting/index#identifying-clusters-offline-after-certificate-change)
 
 ```
-$ oc apply -f cluster-config/global/applications/cert-manager-operator.yaml
-$ oc apply -f cluster-config/global/applications/cluster-certificates.yaml
+$ oc apply -f cluster-config/applications/cluster-certificates.yaml
+```
+
+We can also deploy our base configuration
+
+```
+$ oc apply -f cluster-config/applications/base-config.yaml
 ```

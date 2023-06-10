@@ -3,6 +3,8 @@ kind: Certificate
 metadata:
   name: letsencrypt-api
   namespace: openshift-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   secretName: letsencrypt-api
   duration: 2160h0m0s # 90d
