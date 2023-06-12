@@ -96,10 +96,10 @@ spec:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: github-client-secret
+      name: google-client-secret
       namespace: openshift-config
     data:
-      clientSecret: (base64-encoded client secret from github)
+      clientSecret: (base64-encoded client secret from google)
 EOF
 ```
 
