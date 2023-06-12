@@ -1,3 +1,5 @@
 resources:
 - classification-banner.yaml
 - oauth.yaml
+- group.yaml
+- clusterrolebinding-cluser-admins.yaml
