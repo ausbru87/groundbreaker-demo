@@ -70,6 +70,36 @@ $ oc adm groups add-users cluster-admins <your username>
 
 We are using [sync phases](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) extensively with ArgoCD to place resources in a particular order.
 
+### Deploy Cluster Secrets Management
+
+We will use a lower-level Hive (underneath ACM Cluster Management) to deploy secrets to nodes.
+We want to do this because we need to "push" secrets to the managed clusters from the hub cluster but
+without storing them in Git.
+
+Alternatively we could use some central secret store like Vault but that is out of scope for this project.
+
+```
+$ cat <<EOF | oc create -f -
+apiVersion: hive.openshift.io/v1
+kind: SelectorSyncSet
+metadata:
+  name: secrets
+spec:
+  clusterDeploymentSelector:
+    matchLabels:
+      vendor: OpenShift
+
+  resources:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: github-client-secret
+      namespace: openshift-config
+    data:
+      clientSecret: (base64-encoded client secret from github)
+EOF
+```
+
 ### Deploy Cluster Certificate Management
 
 Now we can deploy the ApplicationSet that manages the cert-manager operator as well as the resources that manage updating the default ingress and API server certificates.
