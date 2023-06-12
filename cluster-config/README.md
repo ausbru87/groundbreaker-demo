@@ -72,11 +72,14 @@ We are using [sync phases](https://argo-cd.readthedocs.io/en/stable/user-guide/s
 
 ### Deploy Cluster Secrets Management
 
-We will use a lower-level Hive (underneath ACM Cluster Management) to deploy secrets to nodes.
-We want to do this because we need to "push" secrets to the managed clusters from the hub cluster but
-without storing them in Git.
+We will use a lower-level Hive (underneath ACM Cluster Management) resource called a SyncSet to deploy
+secrets to nodes. We want to do this because we need to "push" secrets to the managed clusters from the
+hub cluster but without storing them in Git.
 
 Alternatively we could use some central secret store like Vault but that is out of scope for this project.
+
+Another strategy would be to use ACM's ManifestWork which is similar but would require applying to each cluster
+indivdually, this way we only apply one resource and it works for all.
 
 ```
 $ cat <<EOF | oc create -f -
