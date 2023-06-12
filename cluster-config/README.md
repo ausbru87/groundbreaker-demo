@@ -1,19 +1,22 @@
 # Cluster Configuration
 
+This directory holds all of the cluster configuration pushed by ACM to the managed clusters
+
 ## Repository Filesystem Layout
 
 | Directory | Purpose |
 | ---- | ------- |
 | applications/ | Where the ApplicationSets that ACM uses on the hub to configure the managed clusters |
-| global/ | Where all of the generic Kubernetes deployment YAML is |
 | clusters/ | Using Kustomize we build off of the configs in global/ and customize them for the specific cluster |
+| global/ | Where all of the generic Kubernetes deployment YAML is |
 
 ## Getting Started
 
 ### Hub Cluster (groundbreaker-acm)
 
 - install Red Hat OpenShift GitOps Operator
-- bootstrap hub cluster ArgoCD instance and [link ArgoCD to ACM](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.6/html/applications/managing-applications#prerequisites-argo)
+- bootstrap hub cluster ArgoCD instance and link ArgoCD to ACM [(upstream doc)](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.6/html/applications/managing-applications#prerequisites-argo) 
+using the manifests in `groundbreaker-acm/argocd`
 
 ```
 $ oc apply -k groundbreaker-acm/argocd
@@ -23,7 +26,7 @@ $ oc apply -k groundbreaker-acm/argocd
 | ---- | ------- |
 | argocd.yaml | Changes to the OpenShift GitOps cluster install of Argo CD |
 | gitopscluster.yaml, placement.yaml | Sets up the link between ACM and openshift-gitops |
-| managedclustersetbinding.yaml | Adds the ACM ClusterSet grouping to ArgoCD |
+| managedclustersetbinding.yaml | Adds the ACM ClusterSet `global` and `default` groupings to ArgoCD |
 
 Once the links are made, ACM will populate the clusters based on the placement rule in the Argo CD instance in the openshift-gitops namespace.
 
@@ -33,6 +36,8 @@ Since we are using a private repo on GitHub we have to configure ArgoCD to use a
 
 ```
 $ ssh-keygen -m pem -f groundbreaker-demo-deploy-key
+```
+```
 $ cat <<EOF | oc create -f -
 apiVersion: v1
 kind: Secret
@@ -53,6 +58,8 @@ EOF
 Add the public key to the list of [deploy keys for the repository.](https://github.com/rh-nspdev/groundbreaker-demo/settings/keys)
 
 #### Debugging ArgoCD
+
+:warning: This section is only required if you are debugging things in the ArgoCD UI and need read/write access to ArgoCD directly! :warning:
 
 By default, users have no permissions in the cluster-wide ArgoCD deployed into the `openshift-gitops` namespace. We will add our user to a cluster-admins group to debug ArgoCD directly.
 
