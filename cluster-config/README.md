@@ -103,6 +103,26 @@ spec:
 EOF
 ```
 
+```
+apiVersion: work.open-cluster-management.io/v1
+kind: ManifestWork
+metadata:
+  name: groundbreaker-edgefac1-google-auth
+  namespace: groundbreaker-edgefac1
+spec:
+  deleteOption:
+    propagationPolicy: Orphan
+  workload:
+    manifests:
+    - apiVersion: v1
+      kind: Secret
+      metadata:
+        name: google-client-secret
+        namespace: openshift-config
+      data:
+        clientSecret: (client secret)
+```
+
 ### Deploy Cluster Certificate Management
 
 Now we can deploy the ApplicationSet that manages the cert-manager operator as well as the resources that manage updating the default ingress and API server certificates.
