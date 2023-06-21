@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../../global/cluster-certificates
+
+patches:
+- patch: |-
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: letsencrypt-ingress
+      namespace: openshift-ingress
+    spec:
+      commonName: "*.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+      dnsNames:
+      - "*.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+- patch: |-
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: letsencrypt-api
+      namespace: openshift-config
+    spec:
+      commonName: "api.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+      dnsNames:
+      - "api.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+- patch: |-
+    apiVersion: config.openshift.io/v1
+    kind: APIServer
+    metadata:
+      name: cluster
+    spec:
+      servingCerts:
+        namedCertificates:
+        - names:
+          - "api.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+          servingCertificate:
+            name: letsencrypt-api
