@@ -1,0 +1,15 @@
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  name: cluster-admins
+users:
+- abruhn@redhat.com
+- rweather@redhat.com
+- dvantol@redhat.com
+- dhartman@redhat.com
+- jkincl@redhat.com
+- jsturges@redhat.com
+- jrossboo@redhat.com
+- mshoger@redhat.com
+- pabrown@redhat.com
+- rmoore@redhat.com
