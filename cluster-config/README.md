@@ -92,7 +92,7 @@ spec:
       - OpenShift
 ---
 apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding`
+kind: PlacementBinding
 metadata:
   name: binding-secret-management
 placementRef:
