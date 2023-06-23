@@ -72,56 +72,66 @@ We are using [sync phases](https://argo-cd.readthedocs.io/en/stable/user-guide/s
 
 ### Deploy Cluster Secrets Management
 
-We will use a lower-level Hive (underneath ACM Cluster Management) resource called a SyncSet to deploy
-secrets to nodes. We want to do this because we need to "push" secrets to the managed clusters from the
-hub cluster but without storing them in Git.
-
-Alternatively we could use some central secret store like Vault but that is out of scope for this project.
-
-Another strategy would be to use ACM's ManifestWork which is similar but would require applying to each cluster
-indivdually, this way we only apply one resource and it works for all.
+We will use an ACM Governance Policy to deploy secrets to nodes. We want to do this because we need
+to "push" secrets to the managed clusters from the hub cluster but without storing them in Git.
 
 ```
-$ cat <<EOF | oc create -f -
-apiVersion: hive.openshift.io/v1
-kind: SelectorSyncSet
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
 metadata:
-  name: secrets
+  name: placement-secret-management
 spec:
-  clusterDeploymentSelector:
-    matchLabels:
-      vendor: OpenShift
-
-  resources:
-  - apiVersion: v1
-    kind: Secret
-    metadata:
-      name: google-client-secret
-      namespace: openshift-config
-    data:
-      clientSecret: (base64-encoded client secret from google)
-EOF
-```
-
-```
-apiVersion: work.open-cluster-management.io/v1
-kind: ManifestWork
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+    - key: vendor
+      operator: In
+      values:
+      - OpenShift
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding`
 metadata:
-  name: groundbreaker-edgefac1-google-auth
-  namespace: groundbreaker-edgefac1
+  name: binding-secret-management
+placementRef:
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+  name: placement-secret-management
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: Policy
+  name: secret-management
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: secret-management
 spec:
-  deleteOption:
-    propagationPolicy: Orphan
-  workload:
-    manifests:
-    - apiVersion: v1
-      kind: Secret
+  disabled: false
+  remediationAction: enforce
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
       metadata:
-        name: google-client-secret
-        namespace: openshift-config
-      data:
-        clientSecret: (client secret)
+        name: secrets
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: google-client-secret
+              namespace: openshift-config
+            data:
+              clientSecret: (base64-encoded client secret from google)
+        remediationAction: enforce
+        severity: low
 ```
+
 
 ### Deploy Cluster Certificate Management
 
