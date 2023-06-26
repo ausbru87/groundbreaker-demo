@@ -75,11 +75,20 @@ We are using [sync phases](https://argo-cd.readthedocs.io/en/stable/user-guide/s
 We will use an ACM Governance Policy to deploy secrets to nodes. We want to do this because we need
 to "push" secrets to the managed clusters from the hub cluster but without storing them in Git.
 
+First create the acm-policies project
+
+```
+oc new-project acm-policies
+```
+
+Add the first policy for managing the Google IDP shared secret for all clusters
+
 ```
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: placement-secret-management
+  namespace: acm-policies
 spec:
   clusterConditions:
   - status: "True"
@@ -95,6 +104,7 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
   name: binding-secret-management
+  namespace: acm-policies
 placementRef:
   apiGroup: apps.open-cluster-management.io
   kind: PlacementRule
@@ -108,6 +118,7 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
   name: secret-management
+  namespace: acm-policies
 spec:
   disabled: false
   remediationAction: enforce
@@ -132,6 +143,69 @@ spec:
         severity: low
 ```
 
+Add the second policy for managing the route53 credentials for certificate management
+on bare metal clusters.
+
+```
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-cloud-secret
+  namespace: acm-policies
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+    - key: cloud
+      operator: In
+      values:
+      - BareMetal
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-cloud-secret
+  namespace: acm-policies
+placementRef:
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+  name: placement-cloud-secret
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: Policy
+  name: cloud-secret
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: cloud-secret
+  namespace: acm-policies
+spec:
+  disabled: false
+  remediationAction: enforce
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cloud-secret
+      spec:
+        object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                kind: Secret
+                apiVersion: v1
+                metadata:
+                  name: cloud-credentials
+                  namespace: cert-manager
+                data:
+                  aws_access_key_id: REDACTED
+                  aws_secret_access_key: REDACTED
+                  credentials: REDACTED
+                type: Opaque
+```
 
 ### Deploy Cluster Certificate Management
 
