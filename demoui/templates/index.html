@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Capture</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Image Capture</h1>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Sensor Status
+            </div>
+            <div class="card-body">
+                {% if sensor_initialized %}
+                    <p class="text-success">Sensor Initialized</p>
+                {% else %}
+                    <form method="post" action="/init-sensor">
+                        <button type="submit" class="btn btn-danger">Initialize Sensor</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <form method="post" action="/capture-images">
+                    <button type="submit" class="btn btn-danger">Capture Images</button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form method="post" action="/get-image">
+                    <button type="submit" class="btn btn-danger">Get Image</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
