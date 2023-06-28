@@ -9,32 +9,12 @@ import time
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('ImageSensor')
 
-def add_watermark(image):
-    # Create a transparent layer for the watermark
-    watermark = Image.new('RGBA', image.size, (0, 0, 0, 0))
-
-    # Set watermark text
-    text = "IMAGE IS UNCLASSIFIED - Generated Imagery"
-    font = ImageFont.truetype('/usr/share/fonts/dejavu/DejaVuSans.ttf', 20)
-
-
-    # Calculate text position
-    text_width, text_height = font.getsize(text)
-    x = image.width - text_width - 10
-    y = image.height - text_height - 10
-
-    # Draw the watermark text on the transparent layer
-    draw = ImageDraw.Draw(watermark)
-    draw.text((x, y), text, font=font, fill=(255, 255, 255, 128))
-
-    # Combine the original image and the watermark layer
-    watermarked_image = Image.alpha_composite(image.convert('RGBA'), watermark)
-
-    return watermarked_image
-
-
 class ImageSensor:
     def __init__(self, width, height):
+        self.min_width = 400
+        self.max_width = 1920
+        self.min_height = 400
+        self.max_height = 1080
         self.width = width
         self.height = height
         self.sensor_size = (self.width, self.height)
@@ -94,10 +74,11 @@ class ImageSensor:
         while not self.image_queue.full():
             selected_function = random.choice([self.generate_ship_image, self.generate_null_image])
             selected_function()
+            self.randomize_sensor_size()
 
-    def set_sensor_size(self, width, height):
-        self.width = width
-        self.height = height
+    def randomize_sensor_size(self):
+        self.width = random.randint(self.min_width, self.max_width)
+        self.height = random.randint(self.min_height, self.max_height)
         self.sensor_size = (self.width, self.height)
         logger.info(f'resized sensor: {self.sensor_size}')
     
@@ -109,13 +90,12 @@ class ImageSensor:
         logger.debug('image retrieved')
         return  jsonify({'image': image_data.decode})
     
-    def store_images(self):
+    def send_images(self):
         while not self.image_queue.empty():
             image_data = self.image_queue.get()
             if image_data[1] == 1:
                 image = Image.open(io.BytesIO(image_data[0]))
 
-                watermarked_image = add_watermark(image)
-
-                watermarked_image.save(f"./images/generated-image_{self.capture_count}.png", "PNG")
+                image.save(f"./images/generated-image_{self.capture_count}.png", "PNG")
                 self.capture_count += 1
+
