@@ -23,35 +23,32 @@ class ImageSensor:
         logger.info(f'sensor initialized width {self.width} height {self.height}')
 
     def generate_ship_image(self):
-        background_color = (58, 110, 165)  # Darker blue background
-        object_color = (105, 105, 105)  # Dark gray objects
-        text_color = (0, 0, 0)  # Black text color
+        background_color = (135, 206, 250)  # Light blue background
+        object_color = (0, 0, 0)  # Black ship object color
         size = self.sensor_size
+
         # Create a new image with the specified size and background color
         image = Image.new("RGB", size, background_color)
         draw = ImageDraw.Draw(image)
 
-        # Randomly generate the size and position of the ship objects (ellipses in this case)
+        # Randomly generate the size and position of the ship objects (rectangles in this case)
         object_width = random.randint(80, 120)
         object_height = random.randint(30, 70)
         object_x = random.randint(0, size[0] - object_width)
         object_y = random.randint(0, size[1] - object_height)
-        draw.ellipse((object_x, object_y, object_x + object_width, object_y + object_height), fill=object_color)
 
-        # Add the text "SHIP" in the middle of the ellipse
-        text = "SHIP"
-        text_width, text_height = draw.textsize(text)
-        text_x = object_x + (object_width - text_width) // 2
-        text_y = object_y + (object_height - text_height) // 2
-        draw.text((text_x, text_y), text, fill=text_color)
+        # Draw the ship object as a rectangle
+        draw.rectangle((object_x, object_y, object_x + object_width, object_y + object_height), fill=object_color)
 
+    
         # Save image data to in-memory buffer
         image_buffer = io.BytesIO()
         image.save(image_buffer, format='PNG')
         image_data = image_buffer.getvalue()
         
-        self.image_queue.put((image_data, 1))
-        return {'message': 'Geospatial image of ship generated and stored successfully'}
+        self.image_queue.put(image_data)
+        logger.info('generated NON-SHIP image')
+        return {'message': 'image of ship generated and stored in local buffer successfully'}
 
     def generate_null_image(self):
         background_color = (58, 110, 165)  # Darker blue background
@@ -64,8 +61,9 @@ class ImageSensor:
         image.save(image_buffer, format='PNG')
         image_data = image_buffer.getvalue()
         
-        self.image_queue.put((image_data, 0))
-        return {'message': 'Geospatial image of military base generated and stored successfully'}
+        self.image_queue.put(image_data)
+        logger.info('generated ocean only image')
+        return {'message': 'image of ocean generated and stored in local buffer successfully'}
 
     def capture_images(self):
         if self.image_queue.full():
@@ -82,20 +80,12 @@ class ImageSensor:
         self.sensor_size = (self.width, self.height)
         logger.info(f'resized sensor: {self.sensor_size}')
     
-    def get_image(self):
-        if image_queue.empty():
-            logger.warn('No images available')
-            return jsonify({'message': 'No images available'})
-        image_data = image_queue.get()
-        logger.debug('image retrieved')
-        return  jsonify({'image': image_data.decode})
-    
-    def send_images(self):
+    def store_images(self, image_dir_path):
         while not self.image_queue.empty():
             image_data = self.image_queue.get()
-            if image_data[1] == 1:
-                image = Image.open(io.BytesIO(image_data[0]))
+            image = Image.open(io.BytesIO(image_data))
 
-                image.save(f"./images/generated-image_{self.capture_count}.png", "PNG")
-                self.capture_count += 1
+            image.save(f"{image_dir_path}/generated-image_{self.capture_count}.png", "PNG")
+            logger.info(f"successfully stored: {image_dir_path}/generated-image_{self.capture_count}.png")
+            self.capture_count += 1
 
