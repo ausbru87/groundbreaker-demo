@@ -1,34 +1,23 @@
 from flask import Flask
-from EdgeDevice.ImageSensor.ImageSensor import ImageSensor
+from ImageSensor import ImageSensor
 
-images = []
-sensor = ImageSensor(width=640,height=640)
 app = Flask(__name__)
-
-@app.route('/sensor-data', methods=['POST'])
-def acquire_sensor_data():
-    # Acquire sensor data
-    # Replace this with actual code to capture sensor data
-    sensor_data = {'image': 'path/to/image'}
-    
-    # Send sensor data to Image Processing Microservice
-    # Replace with appropriate request to the Image Processing Microservice
-    # ...
-
-    return '', 200
 
 @app.route('/init-sensor', methods=['POST'])
 def initialize_sensor():
-    sensor = ImageSensor(640,640)
+    global sensor
+    sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir='/images')
     return '',200
 
 @app.route('/capture-images', methods=['POST'])
 def capture_images():
-    acc = 0
-    while acc < 502:
-        sensor.capture_image()
-        acc += 1
-    return '', 200
+    sensor.capture_images()
+    return '',200
+
+@app.route('/store-images', methods=['POST'])
+def store_images():
+    sensor.store_images()
+    return '',200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=8080)

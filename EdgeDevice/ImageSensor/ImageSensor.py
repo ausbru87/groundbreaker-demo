@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('ImageSensor')
 
 class ImageSensor:
-    def __init__(self, width, height):
+    def __init__(self, width, height, queue_size, images_dir):
         self.min_width = 400
         self.max_width = 1920
         self.min_height = 400
@@ -19,7 +19,8 @@ class ImageSensor:
         self.height = height
         self.sensor_size = (self.width, self.height)
         self.capture_count = 0
-        self.image_queue = LifoQueue(maxsize=500)
+        self.image_queue = LifoQueue(maxsize=queue_size)
+        self.images_dir = images_dir
         logger.info(f'sensor initialized width {self.width} height {self.height}')
 
     def generate_ship_image(self):
@@ -47,7 +48,7 @@ class ImageSensor:
         image_data = image_buffer.getvalue()
         
         self.image_queue.put(image_data)
-        logger.info('generated NON-SHIP image')
+        logger.info('generated ship image')
         return {'message': 'image of ship generated and stored in local buffer successfully'}
 
     def generate_null_image(self):
@@ -80,12 +81,12 @@ class ImageSensor:
         self.sensor_size = (self.width, self.height)
         logger.info(f'resized sensor: {self.sensor_size}')
     
-    def store_images(self, image_dir_path):
+    def store_images(self):
         while not self.image_queue.empty():
             image_data = self.image_queue.get()
             image = Image.open(io.BytesIO(image_data))
 
-            image.save(f"{image_dir_path}/generated-image_{self.capture_count}.png", "PNG")
-            logger.info(f"successfully stored: {image_dir_path}/generated-image_{self.capture_count}.png")
+            image.save(f"{self.images_dir}/generated-image_{self.capture_count}.png", "PNG")
+            logger.info(f"successfully stored: {self.images_dir}/generated-image_{self.capture_count}.png")
             self.capture_count += 1
 
