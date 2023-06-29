@@ -1,81 +1,98 @@
-import os
 import requests
-import time
-from io import BytesIO
+from queue import Queue
+import threading
+import logging
+import os
 
 class ImageDownlinker:
-    def __init__(self):
-        self.current_downlink_site = 'edgefacility-a'
-        self.api_check_interval = 10  # seconds
-        self.image_directory = '/path/to/images'
-        self.endpoint_a = 'http://127.0.0.1:8085/upload'
-        self.endpoint_b = 'http://127.0.0.1:8086/upload'
+    def __init__(self, facility_a, facility_b, image_dir):
+        self.facility_a = facility_a
+        self.facility_b = facility_b
+        self.image_dir = image_dir
+        self.active_facility = facility_a
+        self.online_state_a = True
+        self.online_state_b = True
+        self.downlink_queue = Queue()
 
-    def monitor_services(self):
-        while True:
-            api_status_a = self.check_api_status('edgefacility-a')
-            api_status_b = self.check_api_status('edgefacility-b')
+        # Logger instance
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-            if self.current_downlink_site == 'edgefacility-a' and not api_status_a:
-                print("Switching downlink site to edgefacility-b...")
-                self.current_downlink_site = 'edgefacility-b'
+        # Add a stream handler to log to console
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(formatter)
+        self.logger.addHandler(console_handler)
 
-            if self.current_downlink_site == 'edgefacility-b' and not api_status_b:
-                print("Switching downlink site to edgefacility-a...")
-                self.current_downlink_site = 'edgefacility-a'
+        # Start enqueuing images
+        self.start_enqueuing_images()
 
-            time.sleep(self.api_check_interval)
+        # Start monitoring facilities
+        self.monitor_thread = threading.Thread(target=self.monitor_facilities, daemon=True)
+        self.monitor_thread.start()
 
-    def check_api_status(self, edgefacility):
+    def perform_downlink(self, image_data):
+        if not self.active_facility:
+            return
+
+        endpoint = self.active_facility + "/upload"
         try:
-            response = requests.get(f"https://{edgefacility}.api.example.com/status")
-            return response.status_code == 200
-        except requests.exceptions.RequestException:
-            return False
+            response = requests.post(endpoint, data=image_data)
+            if response.status_code == 200:
+                self.logger.info("Image successfully downlinked to %s", self.active_facility)
+            else:
+                self.logger.warning("Failed to downlink image to %s", self.active_facility)
+        except requests.exceptions.RequestException as e:
+            self.logger.error("Image downlink failed. Error: %s", e)
 
-    def perform_downlink(self):
+    def monitor_facilities(self):
         while True:
-            if self.current_downlink_site == 'edgefacility-a':
-                api_status = self.check_api_status('edgefacility-a')
-                if not api_status:
-                    print("Switching downlink site to edgefacility-b...")
-                    self.current_downlink_site = 'edgefacility-b'
-                    continue
+            self.check_facility_status(self.facility_a, "a")
+            self.check_facility_status(self.facility_b, "b")
 
-                target_endpoint = self.endpoint_a
+    def check_facility_status(self, facility, facility_name):
+        try:
+            response = requests.get(facility + "/status")
+            online_state = response.status_code == 200
+        except requests.exceptions.RequestException:
+            online_state = False
 
-            if self.current_downlink_site == 'edgefacility-b':
-                api_status = self.check_api_status('edgefacility-b')
-                if not api_status:
-                    print("Switching downlink site to edgefacility-a...")
-                    self.current_downlink_site = 'edgefacility-a'
-                    continue
+        if facility_name == "a":
+            self.online_state_a = online_state
+        elif facility_name == "b":
+            self.online_state_b = online_state
 
-                target_endpoint = self.endpoint_b
+        if facility == self.active_facility and not online_state:
+            self.switch_facility()
 
-            # Loop through the images in the directory
-            for image_file in os.listdir(self.image_directory):
-                if not image_file.lower().endswith(('.jpg', '.jpeg', '.png')):
-                    continue  # Skip non-image files
+    def switch_facility(self):
+        if self.active_facility == self.facility_a and not self.online_state_b:
+            self.active_facility = None
+            self.logger.info("Both facilities are offline.")
+        elif self.active_facility == self.facility_b and not self.online_state_a:
+            self.active_facility = None
+            self.logger.info("Both facilities are offline.")
+        elif self.active_facility == self.facility_a and self.online_state_b:
+            self.active_facility = self.facility_b
+            self.logger.info("Switched to facility B")
+        elif self.active_facility == self.facility_b and self.online_state_a:
+            self.active_facility = self.facility_a
+            self.logger.info("Switched to facility A")
 
-                image_path = os.path.join(self.image_directory, image_file)
 
-                with open(image_path, 'rb') as f:
-                    image_data = f.read()
+    def enqueue_image(self, image_path):
+        with open(image_path, 'rb') as file:
+            image_data = file.read()
+            self.downlink_queue.put(image_data)
 
-                # Create an in-memory buffer for image data
-                image_buffer = BytesIO(image_data)
+    def start_enqueuing_images(self):
+        for filename in os.listdir(self.image_dir):
+            if filename.endswith('.jpg') or filename.endswith('.png'):  # Add more extensions if needed
+                image_path = os.path.join(self.image_dir, filename)
+                self.enqueue_image(image_path)
 
-                print(f"Performing downlink to {self.current_downlink_site} - Image: {image_file}...")
-
-                # Perform HTTP POST request to send the image data
-                try:
-                    response = requests.post(target_endpoint, files={'image': image_buffer})
-                    if response.status_code == 200:
-                        print("Image upload successful!")
-                    else:
-                        print(f"Image upload failed. Status Code: {response.status_code}")
-                except requests.exceptions.RequestException as e:
-                    print(f"Image upload failed. Error: {e}")
-
-            break  # Break the loop after processing all images
+    def flush_downlink_queue(self):
+        while not self.downlink_queue.empty():
+            image_data = self.downlink_queue.get()
+            self.perform_downlink(image_data)
