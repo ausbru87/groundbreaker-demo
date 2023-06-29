@@ -1,75 +1,81 @@
+import os
+import requests
 import time
-import threading
+from io import BytesIO
 
 class ImageDownlinker:
-    def __init__(self, groundstation1, groundstation2):
-        self.groundstation1 = groundstation1
-        self.groundstation2 = groundstation2
-        self.active_groundstation = groundstation1
-        self.downlink_thread = None
-        self.is_downlinking = False
-        self.is_paused = False
-        self.pause_event = threading.Event()
+    def __init__(self):
+        self.current_downlink_site = 'edgefacility-a'
+        self.api_check_interval = 10  # seconds
+        self.image_directory = '/path/to/images'
+        self.endpoint_a = 'http://127.0.0.1:8085/upload'
+        self.endpoint_b = 'http://127.0.0.1:8086/upload'
 
-    def monitor_heartbeats(self):
+    def monitor_services(self):
         while True:
-            if self.active_groundstation.is_heartbeat_received():
-                print(f"Heartbeat received from {self.active_groundstation.name}.")
-                if not self.is_downlinking:
-                    self.start_downlink()
-                elif self.is_paused:
-                    self.resume_downlink()
-            else:
-                print(f"No heartbeat received from {self.active_groundstation.name}. Switching ground station.")
-                self.switch_groundstation()
+            api_status_a = self.check_api_status('edgefacility-a')
+            api_status_b = self.check_api_status('edgefacility-b')
 
-            time.sleep(5)  # Sleep for 5 seconds between heartbeat checks
+            if self.current_downlink_site == 'edgefacility-a' and not api_status_a:
+                print("Switching downlink site to edgefacility-b...")
+                self.current_downlink_site = 'edgefacility-b'
 
-    def switch_groundstation(self):
-        if self.active_groundstation == self.groundstation1:
-            self.active_groundstation = self.groundstation2
-        else:
-            self.active_groundstation = self.groundstation1
+            if self.current_downlink_site == 'edgefacility-b' and not api_status_b:
+                print("Switching downlink site to edgefacility-a...")
+                self.current_downlink_site = 'edgefacility-a'
 
-        if self.is_downlinking:
-            self.pause_downlink()
-            self.start_downlink()
+            time.sleep(self.api_check_interval)
 
-    def start_downlink(self):
-        self.is_downlinking = True
-        self.downlink_thread = threading.Thread(target=self._downlink_images)
-        self.downlink_thread.start()
+    def check_api_status(self, edgefacility):
+        try:
+            response = requests.get(f"https://{edgefacility}.api.example.com/status")
+            return response.status_code == 200
+        except requests.exceptions.RequestException:
+            return False
 
-    def _downlink_images(self):
-        print(f"Starting satellite downlink to {self.active_groundstation.name}.")
+    def perform_downlink(self):
+        while True:
+            if self.current_downlink_site == 'edgefacility-a':
+                api_status = self.check_api_status('edgefacility-a')
+                if not api_status:
+                    print("Switching downlink site to edgefacility-b...")
+                    self.current_downlink_site = 'edgefacility-b'
+                    continue
 
-        while self.is_downlinking:
-            if not self.is_paused:
-                # Perform the downlinking process here
-                # You can add your actual implementation
+                target_endpoint = self.endpoint_a
 
-                print(f"Downlinking image to {self.active_groundstation.name}.")
-                time.sleep(1)  # Simulating downlinking one image
+            if self.current_downlink_site == 'edgefacility-b':
+                api_status = self.check_api_status('edgefacility-b')
+                if not api_status:
+                    print("Switching downlink site to edgefacility-a...")
+                    self.current_downlink_site = 'edgefacility-a'
+                    continue
 
-            self.pause_event.wait()
+                target_endpoint = self.endpoint_b
 
-    def pause_downlink(self):
-        if self.is_downlinking and not self.is_paused:
-            self.is_paused = True
-            self.pause_event.clear()
-            print("Pausing downlinking process.")
+            # Loop through the images in the directory
+            for image_file in os.listdir(self.image_directory):
+                if not image_file.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    continue  # Skip non-image files
 
-    def resume_downlink(self):
-        if self.is_downlinking and self.is_paused:
-            self.is_paused = False
-            self.pause_event.set()
-            print(f"Resuming downlinking process to {self.active_groundstation.name}.")
+                image_path = os.path.join(self.image_directory, image_file)
 
-# Rest of the code remains the same
+                with open(image_path, 'rb') as f:
+                    image_data = f.read()
 
-# Example usage
-gs1 = GroundStation("Ground Station 1")
-gs2 = GroundStation("Ground Station 2")
+                # Create an in-memory buffer for image data
+                image_buffer = BytesIO(image_data)
 
-downlinker = ImageDownlinker(gs1, gs2)
-downlinker.monitor_heartbeats()
+                print(f"Performing downlink to {self.current_downlink_site} - Image: {image_file}...")
+
+                # Perform HTTP POST request to send the image data
+                try:
+                    response = requests.post(target_endpoint, files={'image': image_buffer})
+                    if response.status_code == 200:
+                        print("Image upload successful!")
+                    else:
+                        print(f"Image upload failed. Status Code: {response.status_code}")
+                except requests.exceptions.RequestException as e:
+                    print(f"Image upload failed. Error: {e}")
+
+            break  # Break the loop after processing all images
