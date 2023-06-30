@@ -11,25 +11,22 @@ images_dir = '/images'
 def upload_image():
 
     image_data = request.data
-
     filename = generate_filename()
-    
     save_image(image_data, filename)
 
-    # Return a response indicating successful image processing
     return 'Image uploaded and saved successfully', 200
 
 @app.route('/status', methods=['GET'])
 def get_status():
-    return 'edgefac is healthy', 200
+    return 'receiver is healthy', 200
 
 def generate_filename():
     unique_id = str(uuid.uuid4())
-    image_filename = f'downlinked-image_{unique_id}.png'
+    image_filename = f'ship-image_{unique_id}.png'
     return image_filename
 
 def save_image(image_data, filename):
-    save_path = os.path.join('/images', filename)
+    save_path = os.path.join('/images/in', filename)
     image = Image.open(BytesIO(image_data))
     image.save(save_path, 'PNG')
 

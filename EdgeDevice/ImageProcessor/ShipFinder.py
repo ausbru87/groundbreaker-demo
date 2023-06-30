@@ -5,13 +5,8 @@ class ShipFinder:
         self.image_path = image_path
 
     def find_ships(self):
-        # Load the image using OpenCV
         image = cv2.imread(self.image_path)
-
-        # Convert the image to grayscale
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        # Apply edge detection to find edges in the image
         edges = cv2.Canny(gray, 50, 150)
 
         # Find contours of the objects in the image
