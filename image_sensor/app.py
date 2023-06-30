@@ -1,13 +1,9 @@
 from flask import Flask
-from ImageSensor import ImageSensor
+from image_sensor import ImageSensor
 
 app = Flask(__name__)
 
-@app.route('/init-sensor', methods=['POST'])
-def initialize_sensor():
-    global sensor
-    sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir='/images')
-    return '',200
+sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir='/images')
 
 @app.route('/capture-images', methods=['POST'])
 def capture_images():

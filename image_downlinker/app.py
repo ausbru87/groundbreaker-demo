@@ -1,7 +1,5 @@
 from flask import Flask, request
-from ImageDownlinker import ImageDownlinker
-import logging
-import os
+from image_downlinker import ImageDownlinker
 
 app = Flask(__name__)
 facility_a = 'http://192.168.92.140:8085'
