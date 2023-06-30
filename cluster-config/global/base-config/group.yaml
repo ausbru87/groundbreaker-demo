@@ -3,6 +3,7 @@ kind: Group
 metadata:
   name: cluster-admins
 users:
+- dmarcus@redhat.com
 - abruhn@redhat.com
 - rweather@redhat.com
 - dvantol@redhat.com
