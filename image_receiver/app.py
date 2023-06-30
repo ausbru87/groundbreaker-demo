@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 
-images_dir = '/images'
+images_dir = '/images/in'
 @app.route('/upload', methods=['POST'])
 def upload_image():
 
@@ -26,7 +26,7 @@ def generate_filename():
     return image_filename
 
 def save_image(image_data, filename):
-    save_path = os.path.join('/images/in', filename)
+    save_path = os.path.join(images_dir, filename)
     image = Image.open(BytesIO(image_data))
     image.save(save_path, 'PNG')
 
