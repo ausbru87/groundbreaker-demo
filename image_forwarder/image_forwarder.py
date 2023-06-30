@@ -7,6 +7,7 @@ class ImageForwarder:
     def __init__(self, image_dir, destination):
         self.forward_queue = Queue()
         self.destination = destination
+        self.image_dir = image_dir
 
         # Logger instance
         self.logger = logging.getLogger(__name__)

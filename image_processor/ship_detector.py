@@ -5,7 +5,7 @@ class ShipDetector:
     def __init__(self, image_path):
         self.image_path = image_path
 
-    def detect_ship(self, image):
+    def detect_ship(self,):
         image = cv2.imread(self.image_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(gray, 50, 150)

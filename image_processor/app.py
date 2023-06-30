@@ -1,8 +1,19 @@
 from flask import Flask
 from image_processor import ImageProcessor
+import os
 
 app = Flask(__name__)
-processor = ImageProcessor(incoming_path='/images/in', outgoing_path='/images/out')
+
+in_path = '/images/in'
+out_path = '/images/out'
+
+if not os.path.exists(out_path):
+    os.mkdir(out_path)
+
+if not os.path.exists(in_path):
+    os.mkdir(in_path)
+
+processor = ImageProcessor(incoming_path=in_path, outgoing_path=out_path)
 
 @app.route('/detect_ships', methods=['POST'])
 def detect_ships():

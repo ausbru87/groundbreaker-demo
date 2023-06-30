@@ -1,9 +1,21 @@
 from flask import Flask
 from image_sensor import ImageSensor
+import os
+
+
+in_path = '/images/in'
+out_path = '/images/out'
+
+if not os.path.exists(out_path):
+    os.mkdir(out_path)
+
+if not os.path.exists(in_path):
+    os.mkdir(in_path)
 
 app = Flask(__name__)
 
-sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir='/images')
+
+sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir=in_path)
 
 @app.route('/capture-images', methods=['POST'])
 def capture_images():

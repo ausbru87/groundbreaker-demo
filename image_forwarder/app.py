@@ -8,11 +8,10 @@ app = Flask(__name__)
 destination_var = 'FORWARD_DESTINATION'
 
 if destination_var in os.environ:
-    destination_value = os.environ[destination_var]
+    destination = os.environ[destination_var]
 else:
     print(f"{destination_var} does not exist in the environment.")
 
-destination = destination_value
 images_dir = '/images/out'
 forwarder = ImageForwarder(images_dir, destination)
 
