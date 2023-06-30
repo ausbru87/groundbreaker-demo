@@ -38,7 +38,7 @@
     - receives and stores the images that were forwarded from the edgefacility
   - image_processor
     - looks at the chips and wraps the ship in a green box and labels it with the word SHIP and stores them on the volume
-  - image_storage_s3
+  - s3_image_uploader
     - reads the image data iin the volume and copies it to an S3 bucket for future use or archive
 
 
