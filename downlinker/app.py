@@ -31,6 +31,7 @@ def handle_downlink():
     global downlinker
 
     if downlinker.active_facility:
+        downlinker.start_enqueuing_images()
         downlinker.flush_downlink_queue()
         return "Image downlink initiated."
     else:

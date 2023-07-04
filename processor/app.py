@@ -19,7 +19,7 @@ processor = ImageProcessor(incoming_path=in_path, outgoing_path=out_path)
 @app.route('/detect_ships', methods=['POST'])
 def detect_ships():
     processor.process_dir_detect()
-    response = requests.post('http://downlinker:8082/downlink')
+    response = requests.post('http://192.168.5.108:8083/downlink')
     if response == 200:
         return 'sent downlink command successfully and detected ships successfully',200
     return 'detected ships successfully',200

@@ -43,6 +43,6 @@ echo "Starting ${DOWNLINKER_NAME}"
 podman run --name ${DOWNLINKER_NAME} -d \
 	-p ${DOWNLINKER_PORT}:8080 \
 	-v ${STORAGE_VOL}:/images \
-	-e "FACILITY_A=https://imagereceiver-groundbreaker-edgefac1.apps.groundbreaker-edgefac1.rhtps.io" \
+	-e "FACILITY_A=https://receiver-groundbreaker-edgefac1.apps.groundbreaker-edgefac1.rhtps.io" \
 	-e "FACILITY_B=https://imagereceiver-groundbreaker-edgefac2.apps.groundbreaker-edgefac2.rhtps.io" \
 	${DOWNLINKER_IMAGE}

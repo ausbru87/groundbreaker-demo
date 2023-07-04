@@ -25,9 +25,6 @@ class ImageDownlinker:
         console_handler.setFormatter(formatter)
         self.logger.addHandler(console_handler)
 
-        # Start enqueuing images
-        self.start_enqueuing_images()
-
         # Start monitoring facilities
         self.monitor_thread = threading.Thread(target=self.monitor_facilities, daemon=True)
         self.monitor_thread.start()
