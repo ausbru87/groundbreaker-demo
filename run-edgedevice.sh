@@ -10,6 +10,8 @@ podman rm -f ${DOWNLINKER_NAME}
 
 podman volume rm ${STORAGE_VOL}
 
+podman rmi --all --force
+
 ## Create Volume
 podman volume create ${STORAGE_VOL}
 

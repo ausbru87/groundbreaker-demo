@@ -22,7 +22,7 @@ sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir=in_path)
 def capture_images():
     sensor.capture_images()
     sensor.store_images()
-    response = requests.post('processor:8082/detect_ships')
+    response = requests.post('http://processor:8082/detect_ships')
     if response == 200:
         return 'captured images successfully and sent processing command to processor successfully',200
     return 'captured images successfully',200
