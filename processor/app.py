@@ -1,6 +1,7 @@
 from flask import Flask
 from image_processor import ImageProcessor
 import os
+import requests
 
 app = Flask(__name__)
 
@@ -18,7 +19,10 @@ processor = ImageProcessor(incoming_path=in_path, outgoing_path=out_path)
 @app.route('/detect_ships', methods=['POST'])
 def detect_ships():
     processor.process_dir_detect()
-    return 'processed images to detect ships successfully',200
+    response = requests.post('downlinker:8082/downlink')
+    if response == 200:
+        return 'sent downlink command successfully and detected ships successfully',200
+    return 'detected ships successfully',200
 
 @app.route('/chip_ships', methods=['POST'])
 def chip_ships():
