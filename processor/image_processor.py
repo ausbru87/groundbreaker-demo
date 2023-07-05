@@ -28,10 +28,11 @@ class ImageProcessor:
         for filename in os.listdir(self.incoming_path):
             if filename.endswith(".png"):
                 image_path = os.path.join(self.incoming_path, filename)
+                logger.debug(f'image_path: {image_path}')
                 ship_detector = ShipDetector(image_path)
                 chip_data = ship_detector.chip_ship()
                 logger.info("Chipping ship image")
-                return chip_data
+                self.save_images(type='chip',image_data=chip_data)
     
     def process_dir_label(self):
         for filename in os.listdir(self.incoming_path):
@@ -40,11 +41,11 @@ class ImageProcessor:
                 ship_detector = ShipDetector(image_path)
                 label_data = ship_detector.label_ship()
                 logger.info("Labeling ship object in image")
-                return label_data
+                self.save_images(type='labeled',image_data=label_data)
 
     def save_images(self, type, image_data):
         file_path = self.generate_filenmae(type)
-        cv2.imwrie(file_path, image_data, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+        cv2.imwrite(file_path, image_data, [cv2.IMWRITE_PNG_COMPRESSION, 0])
         logger.info("successfully saved {file_path}")
     
     def generate_filenmae(self, type):
