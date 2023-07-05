@@ -1,24 +1,41 @@
-from flask import Flask, jsonify
-from s3_image_uploader import S3ImageUploader
 import os
+import boto3
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route('/upload', methods=['POST'])
-def upload_to_s3_endpoint():
-    try:
-        aws_access_key_id = os.environ['AWS_ACCESS_KEY']
-        aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
-        bucket_name = os.environ['S3_BUCKET']
-        image_dir = os.environ['IMAGE_DIR']
+def upload_image_to_s3(bucket_name, object_key, file_path):
+    s3 = boto3.client('s3')
 
-        image_uploader = S3ImageUploader(bucket_name)
-        image_uploader.upload_png_to_s3(image_dir)
+    with open(file_path, 'rb') as file:
+        content = file.read()
 
-        return jsonify({"message": "PNG files successfully copied to S3."}), 200
+    response = s3.put_object(
+        Bucket=bucket_name,
+        Key=object_key,
+        Body=content
+    )
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    print(f"Uploaded {file_path} to S3. Response:", response)
+
+@app.route('/upload_images', methods=['POST'])
+def upload_images():
+    bucket_name = 'groundbreaker-images'  # Replace with your S3 bucket name
+
+    # Directory containing image files to upload
+    image_directory = '/images/out'
+
+    # List all files in the directory
+    image_files = os.listdir(image_directory)
+    uploaded_images = []
+
+    for image_file in image_files:
+        file_path = os.path.join(image_directory, image_file)
+        object_key = f'images/{image_file}'  # Object key in S3, you can modify this as needed
+        upload_image_to_s3(bucket_name, object_key, file_path)
+        uploaded_images.append(image_file)
+
+    return jsonify({"uploaded_images": uploaded_images})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', debug=True, port=8080)
