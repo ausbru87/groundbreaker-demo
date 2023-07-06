@@ -6,6 +6,7 @@ import requests
 
 in_path = '/images/in'
 out_path = '/images/out'
+processor_url = 'http://192.168.5.108:8082'
 
 if not os.path.exists(out_path):
     os.mkdir(out_path)
@@ -22,7 +23,7 @@ sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir=in_path)
 def capture_images():
     sensor.capture_images()
     sensor.store_images()
-    response = requests.post('http://192.168.5.108:8082/detect_ships')
+    response = requests.post(f'{processor_url}/detect_ships')
     if response == 200:
         return 'captured images successfully and sent processing command to processor successfully',200
     return 'captured images successfully',200

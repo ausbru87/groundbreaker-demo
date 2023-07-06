@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Gallery</title>
+    <style>
+        .image-thumbnail {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Gallery</h1>
+
+    <div id="gallery"></div>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.102.0.min.js"></script>
+    <script>
+        // Set the bucket name
+        var bucketName = 'grounbreaker-images';
+
+        // Initialize the AWS SDK
+        AWS.config.update({
+            region: 'us-east-1' // Replace with your desired AWS region
+        });
+        var s3 = new AWS.S3();
+
+        // Function to fetch the list of images from the S3 bucket
+        function listImages() {
+            var params = {
+                Bucket: bucketName,
+                Delimiter: '/',
+                Prefix: 'images/'
+            };
+
+            s3.listObjects(params, function(err, data) {
+                if (err) {
+                    console.log(err, err.stack);
+                    return;
+                }
+
+                var images = data.Contents;
+
+                // Create HTML elements for each image
+                images.forEach(function(image) {
+                    var imageUrl = s3.getSignedUrl('getObject', { Bucket: bucketName, Key: image.Key });
+                    var thumbnail = document.createElement('img');
+                    thumbnail.setAttribute('src', imageUrl);
+                    thumbnail.classList.add('image-thumbnail');
+                    document.getElementById('gallery').appendChild(thumbnail);
+                });
+            });
+        }
+
+        // Call the function to list the images when the page is loaded
+        window.onload = listImages;
+    </script>
+</body>
+</html>
