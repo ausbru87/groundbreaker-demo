@@ -23,7 +23,6 @@ class ImageForwarder:
         # Start enqueuing images
         self.start_enqueuing_images()
 
-
     def perform_forward(self, image_data):
 
         endpoint = self.destination + "/upload"
@@ -46,6 +45,8 @@ class ImageForwarder:
             if filename.endswith('.jpg') or filename.endswith('.png'):  # Add more extensions if needed
                 image_path = os.path.join(self.image_dir, filename)
                 self.enqueue_image(image_path)
+                # TODO: Make sure the file is forwarded before the deletion of the src file
+                os.remove(image_path)
 
     def flush_forward_queue(self):
         while not self.forward_queue.empty():

@@ -88,6 +88,8 @@ class ImageDownlinker:
             if filename.endswith('.jpg') or filename.endswith('.png'):  # Add more extensions if needed
                 image_path = os.path.join(self.image_dir, filename)
                 self.enqueue_image(image_path)
+                # TODO: Make sure the file is saved before the deletion of the src file
+                os.remove(image_path)
 
     def flush_downlink_queue(self):
         while not self.downlink_queue.empty():
