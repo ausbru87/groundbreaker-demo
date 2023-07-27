@@ -36,7 +36,9 @@ class ImageProcessor:
                 chip_data = ship_detector.chip_ship()
                 logger.info("Processed {self.processed_count} Image -- Chipping ship image")
                 self.save_images(type='chip',image_data=chip_data)
-    
+                # TODO: Make sure the file is saved before the deletion of the src file
+                os.remove(image_path)
+
     def process_dir_label(self):
         for filename in os.listdir(self.incoming_path):
             if filename.endswith(".png"):
@@ -46,6 +48,8 @@ class ImageProcessor:
                 label_data = ship_detector.label_ship()
                 logger.info("Processed {self.processed_count} Image -- Labeling ship object in image")
                 self.save_images(type='labeled',image_data=label_data)
+                # TODO: Make sure the file is saved before the deletion of the src file
+                os.remove(image_path)
 
     def save_images(self, type, image_data):
         file_path = self.generate_filenmae(type)

@@ -34,6 +34,9 @@ def upload_images():
         object_key = f'images/{image_file}'  # Object key in S3, you can modify this as needed
         upload_image_to_s3(bucket_name, object_key, file_path)
         uploaded_images.append(image_file)
+        # TODO: Make sure the file is saved before the deletion of the src file
+        os.remove(file_path)
+
 
     return jsonify({"uploaded_images": uploaded_images})
 
