@@ -1,0 +1,60 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
+    app.openshift.io/route-disabled: 'false'
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"s3uploader:latest","namespace":"groundbreaker-aws"},"fieldPath":"spec.template.spec.containers[?(@.name==\"s3uploader\")].image","pause":"false"}]
+  name: s3uploader
+  namespace: groundbreaker-aws
+  labels:
+    app: s3uploader
+    app.kubernetes.io/component: s3uploader
+    app.kubernetes.io/instance: s3uploader
+    app.kubernetes.io/name: s3uploader
+    app.kubernetes.io/part-of: groundbreaker-core-aws-demo
+    app.openshift.io/runtime: python
+    app.openshift.io/runtime-namespace: groundbreaker-aws
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3uploader
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: s3uploader
+        deployment: s3uploader
+    spec:
+      volumes:
+        - name: images
+          persistentVolumeClaim:
+            claimName: images
+      containers:
+        - name: s3uploader
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/groundbreaker-aws/s3uploader@sha256:3704d9adccde93b5b8c07fdeb5bcb99d9c416f635e3270d076dd8f3f366f88be
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: images
+              mountPath: /images
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
