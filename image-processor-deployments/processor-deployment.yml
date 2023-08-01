@@ -27,8 +27,6 @@ spec:
       labels:
         app: processor
         deployment: processor
-      annotations:
-        openshift.io/generated-by: OpenShiftWebConsole
     spec:
       volumes:
         - name: images

@@ -27,8 +27,6 @@ spec:
       labels:
         app: receiver
         deployment: receiver
-      annotations:
-        openshift.io/generated-by: OpenShiftWebConsole
     spec:
       volumes:
         - name: images
