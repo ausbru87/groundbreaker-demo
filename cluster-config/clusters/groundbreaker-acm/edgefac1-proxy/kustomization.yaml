@@ -1,0 +1,19 @@
+resources:
+- namespace.yaml
+- service.yaml
+- deployment.yaml
+- imagestream.yaml
+- scc.yaml
+
+commonLabels:
+  app.kubernetes.io/name: edgefac1-proxy
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+namespace: edgefac1-proxy
+
+configMapGenerator:
+- name: edgefac1-proxy-config
+  files:
+  - nginx.conf
