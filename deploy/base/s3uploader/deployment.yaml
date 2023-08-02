@@ -1,0 +1,33 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: s3uploader
+  labels:
+    app: s3uploader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3uploader
+  template:
+    metadata:
+      labels:
+        app: s3uploader
+    spec:
+      volumes:
+        - name: images
+          persistentVolumeClaim:
+            claimName: images
+      containers:
+        - name: s3uploader
+          image: quay.io/rhnspdev/groundbreaker-s3uploader:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: images
+              mountPath: /images
+      terminationGracePeriodSeconds: 5
+  strategy:
+    type: RollingUpdate

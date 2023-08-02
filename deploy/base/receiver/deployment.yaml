@@ -1,0 +1,33 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: receiver
+  labels:
+    app: receiver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: receiver
+  template:
+    metadata:
+      labels:
+        app: receiver
+    spec:
+      volumes:
+        - name: images
+          persistentVolumeClaim:
+            claimName: images
+      containers:
+        - name: receiver
+          image: quay.io/rhnspdev/groundbreaker-receiver:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: images
+              mountPath: /images
+      terminationGracePeriodSeconds: 5
+  strategy:
+    type: RollingUpdate

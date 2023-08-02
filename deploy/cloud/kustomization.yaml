@@ -1,0 +1,7 @@
+resources:
+- ../base/processor
+- ../base/receiver
+
+- ../base/s3uploader
+
+namespace: groundbreaker-prod

@@ -1,0 +1,7 @@
+resources:
+- ../base/processor
+- ../base/receiver
+
+- ../base/forwarder
+
+namespace: groundbreaker-prod
