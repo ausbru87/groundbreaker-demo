@@ -32,16 +32,16 @@ spec:
     metadata:
       labels:
         velero.io/exclude-from-backup: "true"
-      name: base-config-{{name}}
+      name: groundbreaker-cloud-{{name}}
     spec:
       destination:
-        namespace: openshift-ingress
+        namespace: groundbreaker-prod
         server: '{{server}}'
       project: default
       source:
-        path: cluster-config/global/base-config
+        path: deploy/cloud
         repoURL: git@github.com:rh-nspdev/groundbreaker-demo.git
-        targetRevision: main
+        targetRevision: app-deployment-update
       syncPolicy:
         automated:
           prune: true
