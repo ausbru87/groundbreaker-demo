@@ -1,0 +1,38 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: forwarder
+  labels:
+    app: forwarder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forwarder
+  template:
+    metadata:
+      labels:
+        app: forwarder
+    spec:
+      volumes:
+        - name: images
+          persistentVolumeClaim:
+            claimName: images
+      containers:
+        - name: forwarder
+          image: quay.io/rhnspdev/groundbreaker-forwarder:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: images
+              mountPath: /images
+          env:
+            - name: AWS_RECEIVER
+              value: receiver-groundbreaker-prod.apps.groundbreaker-aws.rhtps.io
+            - name: AZURE_RECEIVER
+              value: receiver-groundbreaker-prod.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io
+      terminationGracePeriodSeconds: 5
+  strategy:
+    type: RollingUpdate

@@ -1,0 +1,46 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: s3uploader
+  labels:
+    app: s3uploader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3uploader
+  template:
+    metadata:
+      labels:
+        app: s3uploader
+    spec:
+      volumes:
+        - name: images
+          persistentVolumeClaim:
+            claimName: images
+      containers:
+        - name: s3uploader
+          image: quay.io/rhnspdev/groundbreaker-s3uploader:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: images
+              mountPath: /images
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: s3-creds
+                  key: aws_access_key_id
+                  optional: true
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-creds
+                  key: aws_secret_access_key
+                  optional: true
+      terminationGracePeriodSeconds: 5
+  strategy:
+    type: RollingUpdate

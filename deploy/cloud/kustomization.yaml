@@ -1,0 +1,16 @@
+resources:
+- ../base/processor
+- ../base/receiver
+
+- ../base/s3uploader
+- cloud-credential-operator-s3.yaml
+
+images:
+- name: quay.io/rhnspdev/groundbreaker-forwarder
+  newTag: latest
+- name: quay.io/rhnspdev/groundbreaker-processor
+  newTag: latest
+- name: quay.io/rhnspdev/groundbreaker-receiver
+  newTag: latest
+- name: quay.io/rhnspdev/groundbreaker-s3uploader
+  newTag: latest

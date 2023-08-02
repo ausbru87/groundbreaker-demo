@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: s3uploader
+  labels:
+    app: s3uploader
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: s3uploader
