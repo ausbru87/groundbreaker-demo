@@ -41,7 +41,7 @@ spec:
       source:
         path: deploy/cloud
         repoURL: git@github.com:rh-nspdev/groundbreaker-demo.git
-        targetRevision: app-deployment-update
+        targetRevision: main
       syncPolicy:
         automated:
           prune: true
