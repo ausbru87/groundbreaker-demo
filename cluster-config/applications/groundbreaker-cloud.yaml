@@ -14,3 +14,38 @@ spec:
               operator: In
               values:
                 - cloud
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: groundbreaker-cloud
+  namespace: openshift-gitops
+spec:
+  generators:
+  - clusterDecisionResource:
+      configMapRef: acm-placement
+      labelSelector:
+        matchLabels:
+          cluster.open-cluster-management.io/placement: groundbreaker-cloud-placement
+      requeueAfterSeconds: 30
+  template:
+    metadata:
+      labels:
+        velero.io/exclude-from-backup: "true"
+      name: base-config-{{name}}
+    spec:
+      destination:
+        namespace: openshift-ingress
+        server: '{{server}}'
+      project: default
+      source:
+        path: cluster-config/global/base-config
+        repoURL: git@github.com:rh-nspdev/groundbreaker-demo.git
+        targetRevision: main
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
+        - PruneLast=true
