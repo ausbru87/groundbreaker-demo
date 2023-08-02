@@ -4,6 +4,7 @@ resources:
 
 - ../base/s3uploader
 - cloud-credential-operator-s3.yaml
+- cloud-credential-operator-azure.yaml
 
 images:
 - name: quay.io/rhnspdev/groundbreaker-forwarder
