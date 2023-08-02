@@ -8,5 +8,4 @@ spec:
   resources:
     requests:
       storage: 500Gi
-  storageClassName: gp3-csi
   volumeMode: Filesystem
