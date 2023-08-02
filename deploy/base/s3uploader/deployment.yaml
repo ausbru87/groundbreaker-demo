@@ -32,13 +32,13 @@ spec:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: cloud-credential-operator-s3-creds
+                  name: s3-creds
                   key: aws_access_key_id
                   optional: true
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: cloud-credential-operator-s3-creds
+                  name: s3-creds
                   key: aws_secret_access_key
                   optional: true
       terminationGracePeriodSeconds: 5
