@@ -5,15 +5,17 @@ import os
 
 app = Flask(__name__)
 
-destination_var = 'FORWARD_DESTINATION'
+aws_receiver_var = 'AWS_RECEIVER'
+# TODO: Add azure receiver
 
-if destination_var in os.environ:
-    destination = os.environ[destination_var]
+if aws_receiver_var in os.environ:
+    aws_receiver = os.environ[aws_receiver_var]
 else:
-    print(f"{destination_var} does not exist in the environment.")
+    print(f"{aws_receiver_var} does not exist in the environment.")
+    # TODO: make this a logging statement (ERROR)
 
 images_dir = '/images/out'
-forwarder = ImageForwarder(images_dir, destination)
+forwarder = ImageForwarder(images_dir, aws_receiver)
 
 @app.route("/forward", methods=["POST"])
 def handle_forward():
