@@ -1,19 +1,12 @@
 resources:
 - namespace.yaml
-- service.yaml
-- deployment.yaml
-- imagestream.yaml
-- scc.yaml
-
-commonLabels:
-  app.kubernetes.io/name: edgefac2-proxy
-
-generatorOptions:
-  disableNameSuffixHash: true
+- ../console-proxy
 
 namespace: edgefac2-proxy
 
+generatorOptions:
+  disableNameSuffixHash: true
 configMapGenerator:
-- name: edgefac2-proxy-config
+- name: proxy-config
   files:
   - nginx.conf

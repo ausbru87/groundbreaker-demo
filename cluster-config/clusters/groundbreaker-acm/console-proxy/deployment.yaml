@@ -1,8 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: edgefac1-proxy
-  namespace: edgefac1-proxy
+  name: proxy
+  namespace: proxy
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
 spec:
   replicas: 3
   selector:
@@ -15,6 +17,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
       labels:
         app.kubernetes.io/component: deployment
     spec:
@@ -23,7 +27,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchLabels:
-                app.kubernetes.io/name: edgefac1-proxy
+                app.kubernetes.io/name: proxy
             topologyKey: kubernetes.io/hostname
       tolerations:
       - effect: NoSchedule
@@ -41,7 +45,7 @@ spec:
         node-role.kubernetes.io/master: ""
       priorityClassName: system-cluster-critical
       containers:
-      - image: image-registry.openshift-image-registry.svc:5000/edgefac1-proxy/nginx:latest
+      - image: registry.access.redhat.com/ubi9/nginx-120:latest
         name: nginx
         securityContext:
           allowPrivilegeEscalation: true
@@ -76,8 +80,8 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: edgefac1-proxy-config
+          name: proxy-config
 
       # - name: frontend-cert
       #   secret:
-      #     secretName: edgefac1-proxy-cert
+      #     secretName: proxy-cert

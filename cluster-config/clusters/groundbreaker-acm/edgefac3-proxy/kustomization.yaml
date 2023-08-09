@@ -2,7 +2,7 @@ resources:
 - namespace.yaml
 - ../console-proxy
 
-namespace: edgefac1-proxy
+namespace: edgefac3-proxy
 
 generatorOptions:
   disableNameSuffixHash: true
