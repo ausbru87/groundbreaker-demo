@@ -7,9 +7,10 @@ app = Flask(__name__)
 
 in_path = '/images/in'
 out_path = '/images/out'
-downlinker_url = 'http://192.168.5.108:8083'
-forwarder_url = None #TODO add forwarder addresses, which one do you use A r B?
-s3uploader_url = 
+downlinker_url = 'downlinker:8083'
+forwarder_url = 'forwarder:8080'
+s3uploader_url = 's3uploader:8080'
+
 
 if not os.path.exists(out_path):
     os.mkdir(out_path)
@@ -30,12 +31,13 @@ def detect_ships():
 @app.route('/chip_ships', methods=['POST'])
 def chip_ships():
     processor.process_dir_chip()
-    response = requests.post('/forward')
+    response = requests.post(f'{forwarder_url}/forward')
     return 'processed images, generated chips and began forwarding images to core',200
 
 @app.route('/label_ships', methods=['POST'])
 def label_ships():
     processor.process_dir_label()
+    response = request.post(f'{s3uploader_url}/upload')
     return 'processed chips, generated new chips with ships located and labeled and saved them successfully',200
 
 if __name__ == '__main__':
