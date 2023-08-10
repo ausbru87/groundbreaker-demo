@@ -10,26 +10,27 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('ImageSensor')
 
 class ImageSensor:
-    def __init__(self, width, height, queue_size, images_dir):
+    def __init__(self):
         self.min_width = 400
         self.max_width = 1920
         self.min_height = 400
         self.max_height = 1080
-        self.width = width
-        self.height = height
+        self.width = 0
+        self.height = 0
         self.sensor_size = (self.width, self.height)
         self.capture_count = 0
-        self.image_queue = LifoQueue(maxsize=queue_size)
-        self.images_dir = images_dir
+        self.image = None
+        self.randomize_sensor_size()
         logger.info(f'sensor initialized width {self.width} height {self.height}')
+
 
     def generate_ship_image(self):
         background_color = (135, 206, 250)  # Light blue background
         object_color = (0, 0, 0)  # Black ship object color
-        size = self.sensor_size
 
         # Create a new image with the specified size and background color
-        image = Image.new("RGB", size, background_color)
+        self.capture_count += 1
+        self.image = Image.new("RGB", self.sensor_size, background_color)
         draw = ImageDraw.Draw(image)
 
         # Randomly generate the size and position of the ship objects (rectangles in this case)
@@ -40,40 +41,24 @@ class ImageSensor:
 
         # Draw the ship object as a rectangle
         draw.rectangle((object_x, object_y, object_x + object_width, object_y + object_height), fill=object_color)
-
-    
-        # Save image data to in-memory buffer
-        image_buffer = io.BytesIO()
-        image.save(image_buffer, format='PNG')
-        image_data = image_buffer.getvalue()
+        logger.debug(f'generated ship image: image_{self.capture_count}')
         
-        self.image_queue.put(image_data)
-        logger.info('generated ship image')
-        return {'message': 'image of ship generated and stored in local buffer successfully'}
+        return {'message': f'Captured Image: image_{self.capture_count}'}
 
     def generate_null_image(self):
         background_color = (58, 110, 165)  # Darker blue background
-        size = self.sensor_size
+        
         # Create a new image with the specified size and background color
-        image = Image.new("RGB", size, background_color)
-        
-        # Save image data to in-memory buffer
-        image_buffer = io.BytesIO()
-        image.save(image_buffer, format='PNG')
-        image_data = image_buffer.getvalue()
-        
-        self.image_queue.put(image_data)
-        logger.info('generated ocean only image')
-        return {'message': 'image of ocean generated and stored in local buffer successfully'}
+        self.capture_count += 1
+        self.image = Image.new("RGB", self.sensor_size, background_color)
+        logger.debug(f'generated ocean only image: image_{self.capture_count}')
 
-    def capture_images(self):
-        if self.image_queue.full():
-            logger.warn('Unable to capture image because the queue is full')
-            return {'message': 'Unable to capture image because the queue is full'}
-        while not self.image_queue.full():
-            selected_function = random.choice([self.generate_ship_image, self.generate_null_image])
-            selected_function()
-            self.randomize_sensor_size()
+        return {'message': f'Captured Image: image_{self.capture_count}'}
+
+    def capture_image(self):
+        selected_function = random.choice([self.generate_ship_image, self.generate_null_image])
+        selected_function()
+        self.randomize_sensor_size()
 
     def randomize_sensor_size(self):
         self.width = random.randint(self.min_width, self.max_width)
@@ -81,12 +66,8 @@ class ImageSensor:
         self.sensor_size = (self.width, self.height)
         logger.info(f'resized sensor: {self.sensor_size}')
     
-    def store_images(self):
-        while not self.image_queue.empty():
-            image_data = self.image_queue.get()
-            image = Image.open(io.BytesIO(image_data))
-
-            image.save(f"{self.images_dir}/generated-image_{self.capture_count}.png", "PNG")
-            logger.info(f"successfully stored: {self.images_dir}/generated-image_{self.capture_count}.png")
-            self.capture_count += 1
+    def stream_image(self):
+        
+        
+        
 

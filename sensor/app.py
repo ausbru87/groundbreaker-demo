@@ -21,12 +21,15 @@ sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir=in_path)
 
 @app.route('/capture_images', methods=['POST'])
 def capture_images():
-    sensor.capture_images()
-    sensor.store_images()
-    response = requests.post(f'{processor_url}/detect_ships')
-    if response == 200:
-        return 'captured images successfully and sent processing command to processor successfully',200
-    return 'captured images successfully',200
+    capture = True
+    while capture:
+        sensor.capture_image()
+        sensor.stream_image(processor_service)
+        if response == 200:
+            return f'sent image to processor: {processor_service}',200
+        else:
+            return f'there was an error in capturing and sending image to processor, ending captures', 505
+            capture = False
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
