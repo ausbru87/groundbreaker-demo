@@ -30,9 +30,9 @@ spec:
               mountPath: /images
           env:
             - name: AWS_RECEIVER
-              value: receiver-groundbreaker-prod.apps.groundbreaker-aws.rhtps.io
+              value: https://receiver-groundbreaker-prod.apps.groundbreaker-aws.rhtps.io
             - name: AZURE_RECEIVER
-              value: receiver-groundbreaker-prod.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io
+              value: https://receiver-groundbreaker-prod.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io
       terminationGracePeriodSeconds: 5
   strategy:
     type: RollingUpdate
