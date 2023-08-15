@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATE_TAG=$(date +%Y%m%d%H)
+DATE_TAG=$(date +%Y%m%d%H%M)
 VER_TAG=1.1
 REPO_ROOT=$(pwd)
 
