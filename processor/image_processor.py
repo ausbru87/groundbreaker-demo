@@ -2,7 +2,7 @@ from ship_detector import ShipDetector
 import os
 import logging
 import cv2
-import uuid
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('ImageProcessor')
@@ -57,7 +57,7 @@ class ImageProcessor:
         logger.info("successfully saved {file_path}")
     
     def generate_filenmae(self, type):
-        unique_id = uuid.uuid4()
-        filename = f'ship_{type}_{unique_id}.png'
+        ms_epoch = round(time.time() * 1000)
+        filename = f'ship_{type}_{ms_epoch}.png'
         file_path = os.path.join(self.outgoing_path, filename)
         return file_path
