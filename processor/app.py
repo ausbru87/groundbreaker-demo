@@ -37,7 +37,7 @@ def chip_ships():
 @app.route('/label_ships', methods=['POST'])
 def label_ships():
     processor.process_dir_label()
-    response = requests.post(f'{s3uploader_url}/upload')
+    response = requests.post(f'{s3uploader_url}/upload_images')
     return 'processed chips, generated new chips with ships located and labeled and saved them successfully',200
 
 if __name__ == '__main__':
