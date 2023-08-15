@@ -34,7 +34,7 @@ class ImageProcessor:
                 logger.debug(f'image_path: {image_path}')
                 ship_detector = ShipDetector(image_path)
                 chip_data = ship_detector.chip_ship()
-                logger.info("Processed {self.processed_count} Image -- Chipping ship image")
+                logger.info(f"Processed {self.processed_count} Image -- Chipping ship image")
                 self.save_images(type='chip',image_data=chip_data)
                 # TODO: Make sure the file is saved before the deletion of the src file
                 os.remove(image_path)
@@ -46,7 +46,7 @@ class ImageProcessor:
                 image_path = os.path.join(self.incoming_path, filename)
                 ship_detector = ShipDetector(image_path)
                 label_data = ship_detector.label_ship()
-                logger.info("Processed {self.processed_count} Image -- Labeling ship object in image")
+                logger.info(f"Processed {self.processed_count} Image -- Labeling ship object in image")
                 self.save_images(type='labeled',image_data=label_data)
                 # TODO: Make sure the file is saved before the deletion of the src file
                 os.remove(image_path)
@@ -54,7 +54,7 @@ class ImageProcessor:
     def save_images(self, type, image_data):
         file_path = self.generate_filenmae(type)
         cv2.imwrite(file_path, image_data, [cv2.IMWRITE_PNG_COMPRESSION, 0])
-        logger.info("successfully saved {file_path}")
+        logger.info(f"successfully saved {file_path}")
     
     def generate_filenmae(self, type):
         ms_epoch = round(time.time() * 1000)

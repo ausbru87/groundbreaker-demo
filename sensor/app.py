@@ -17,7 +17,7 @@ if not os.path.exists(in_path):
 app = Flask(__name__)
 
 
-sensor = ImageSensor(width=640, height=480, queue_size=500, images_dir=in_path)
+sensor = ImageSensor(width=640, height=480, queue_size=5000, images_dir=in_path)
 
 @app.route('/capture_images', methods=['POST'])
 def capture_images():
