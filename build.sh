@@ -1,8 +1,7 @@
 #!/bin/bash
 
-DATE_TAG=$(date +%Y%m%d)
+DATE_TAG=$(date +%Y%m%d%H)
 VER_TAG=1.1
-LATEST_TAG=latest
 REPO_ROOT=$(pwd)
 
 REGISTRY_ORG=quay.io/rhnspdev

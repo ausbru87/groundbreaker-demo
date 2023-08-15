@@ -7,9 +7,9 @@ app = Flask(__name__)
 
 in_path = '/images/in'
 out_path = '/images/out'
-downlinker_url = 'downlinker:8083'
-forwarder_url = 'forwarder:8080'
-s3uploader_url = 's3uploader:8080'
+downlinker_url = 'http://192.168.5.108:8083'
+forwarder_url = 'http://forwarder:8080'
+s3uploader_url = 'http://s3uploader:8080'
 
 
 if not os.path.exists(out_path):

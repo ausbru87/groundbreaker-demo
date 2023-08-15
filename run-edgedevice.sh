@@ -3,7 +3,7 @@ STORAGE_VOL=groundbreaker-storage
 SENSOR_NAME=sensor
 PROCESSOR_NAME=processor
 DOWNLINKER_NAME=downlinker
-CURRENT_TAG="1.1_20230809i15"
+CURRENT_TAG="1.1_2023081516"
 FACILITY_A="https://receiver-groundbreaker-prod.apps.groundbreaker-edgefac1.rhtps.io"
 FACILITY_B="https://receiver-groundbreaker-prod.apps.groundbreaker-edgefac2.rhtps.io"
 
