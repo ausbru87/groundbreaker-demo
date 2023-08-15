@@ -3,6 +3,9 @@ STORAGE_VOL=groundbreaker-storage
 SENSOR_NAME=sensor
 PROCESSOR_NAME=processor
 DOWNLINKER_NAME=downlinker
+CURRENT_TAG="1.1_20230809i15"
+FACILITY_A="https://receiver-groundbreaker-prod.apps.groundbreaker-edgefac1.rhtps.io"
+FACILITY_B="https://receiver-groundbreaker-prod.apps.groundbreaker-edgefac2.rhtps.io"
 
 podman rm -f ${SENSOR_NAME}
 podman rm -f ${PROCESSOR_NAME}
@@ -17,7 +20,7 @@ podman volume create ${STORAGE_VOL}
 
 ## IMAGE SENSOR
 SENSOR_PORT=8081
-SENSOR_IMAGE=quay.io/rhnspdev/groundbreaker-sensor:latest
+SENSOR_IMAGE=quay.io/rhnspdev/groundbreaker-sensor:${CURRENT_TAG}
 
 echo "Starting ${SENSOR_NAME}"
 podman run --name ${SENSOR_NAME} -d \
@@ -27,7 +30,7 @@ podman run --name ${SENSOR_NAME} -d \
 
 ## IMAGE PROCESSOR
 PROCESSOR_PORT=8082
-PROCESSOR_IMAGE=quay.io/rhnspdev/groundbreaker-processor:latest
+PROCESSOR_IMAGE=quay.io/rhnspdev/groundbreaker-processor:${CURRENT_TAG}
 
 echo "Starting ${PROCESSOR_NAME}"
 podman run --name ${PROCESSOR_NAME} -d \
@@ -37,12 +40,12 @@ podman run --name ${PROCESSOR_NAME} -d \
 
 ## IMAGE DOWNLINKER
 DOWNLINKER_PORT=8083
-DOWNLINKER_IMAGE=quay.io/rhnspdev/groundbreaker-downlinker:latest
+DOWNLINKER_IMAGE=quay.io/rhnspdev/groundbreaker-downlinker:${CURRENT_TAG}
 
 echo "Starting ${DOWNLINKER_NAME}"
 podman run --name ${DOWNLINKER_NAME} -d \
 	-p ${DOWNLINKER_PORT}:8080 \
 	-v ${STORAGE_VOL}:/images \
-	-e "FACILITY_A=https://receiver-groundbreaker-edgefac1.apps.groundbreaker-edgefac1.rhtps.io" \
-	-e "FACILITY_B=https://imagereceiver-groundbreaker-edgefac2.apps.groundbreaker-edgefac2.rhtps.io" \
+	-e "FACILITY_A=${FACILITY_A}" \
+	-e "FACILITY_B=${FACILITY_B}" \
 	${DOWNLINKER_IMAGE}
