@@ -8,10 +8,10 @@ resources:
 
 images:
 - name: quay.io/rhnspdev/groundbreaker-forwarder
-  newTag: "1.1_202308151846"
+  newTag: "1.1_202308151917"
 - name: quay.io/rhnspdev/groundbreaker-processor
-  newTag: "1.1_202308151846"
+  newTag: "1.1_202308151917"
 - name: quay.io/rhnspdev/groundbreaker-receiver
-  newTag: "1.1_202308151846"
+  newTag: "1.1_202308151917"
 - name: quay.io/rhnspdev/groundbreaker-s3uploader
-  newTag: "1.1_202308151846"
+  newTag: "1.1_202308151917"
