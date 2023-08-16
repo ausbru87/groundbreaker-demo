@@ -1,9 +1,10 @@
 #!/bin/bash
 
 DATE_TAG=$(date +%Y%m%d%H%M)
-VER_TAG=1.1
+REL_TAG=1.1
 REPO_ROOT=$(pwd)
-FULL_TAG=${VER_TAG}_${DATE_TAG}
+VER_TAG=1.1
+FULL_TAG=${REL_TAG}
 
 REGISTRY_ORG=quay.io/rhnspdev
 SENSOR_IMAGE=${REGISTRY_ORG}/groundbreaker-sensor
