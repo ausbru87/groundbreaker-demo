@@ -13,9 +13,9 @@ patches:
       name: letsencrypt-ingress
       namespace: openshift-ingress
     spec:
-      commonName: "*.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+      commonName: "*.apps.groundbreaker-azure.9zdlw.azure.redhatworkshops.io"
       dnsNames:
-      - "*.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+      - "*.apps.groundbreaker-azure.9zdlw.azure.redhatworkshops.io"
 - patch: |-
     apiVersion: cert-manager.io/v1
     kind: Certificate
@@ -23,9 +23,9 @@ patches:
       name: letsencrypt-api
       namespace: openshift-config
     spec:
-      commonName: "api.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+      commonName: "api.groundbreaker-azure.9zdlw.azure.redhatworkshops.io"
       dnsNames:
-      - "api.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+      - "api.groundbreaker-azure.9zdlw.azure.redhatworkshops.io"
 - patch: |-
     apiVersion: config.openshift.io/v1
     kind: APIServer
@@ -35,7 +35,7 @@ patches:
       servingCerts:
         namedCertificates:
         - names:
-          - "api.groundbreaker-azure.4xvtd.azure.redhatworkshops.io"
+          - "api.groundbreaker-azure.9zdlw.azure.redhatworkshops.io"
           servingCertificate:
             name: letsencrypt-api
 - patch: |-
@@ -48,11 +48,11 @@ patches:
         solvers:
         - dns01:
             azureDNS:
-              clientID: d332b402-7cc3-4544-9520-e82290396434
+              clientID: fcf2ad51-159f-4c99-9194-61666b346d66
               clientSecretSecretRef:
                 name: cloud-credentials
                 key: azure_client_secret
-              subscriptionID: 5356b74b-bc41-46e6-bd14-9f496b0a9977
+              subscriptionID: b5c9ad97-c628-451e-9adf-eb2c496ef846
               tenantID: 64dc69e4-d083-49fc-9569-ebece1dd1408
-              resourceGroupName: openenv-4xvtd
-              hostedZoneName: 4xvtd.azure.redhatworkshops.io
+              resourceGroupName: openenv-9zdlw
+              hostedZoneName: 9zdlw.azure.redhatworkshops.io
