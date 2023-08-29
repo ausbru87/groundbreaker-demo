@@ -32,7 +32,7 @@ spec:
             - name: AWS_RECEIVER
               value: https://receiver-groundbreaker-prod.apps.groundbreaker-aws.rhtps.io
             - name: AZURE_RECEIVER
-              value: https://receiver-groundbreaker-prod.apps.groundbreaker-azure.4xvtd.azure.redhatworkshops.io
+              value: https://receiver-groundbreaker-prod.apps.groundbreaker-azure.9zdlw.azure.redhatworkshops.io
       terminationGracePeriodSeconds: 5
   strategy:
     type: RollingUpdate
